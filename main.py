@@ -23,7 +23,8 @@ async def root():
 @app.get("/tracks")
 async def get_tracks(page: int = 0, per_page: int = 10):
     app.db_connection.row_factory = aiosqlite.Row
-    cursor = await app.db_connection.execute("SELECT * FROM tracks ORDER BY TrackId LIMIT :per_page"
-                                       "OFFSET :per_page*:page", {'page': page, 'per_page': per_page})
+    cursor = await app.db_connection.execute(
+        "SELECT * FROM tracks ORDER BY TrackId LIMIT :per_page OFFSET :per_page*:page",
+        {'page': page, 'per_page': per_page})
     tracks = await cursor.fetchall()
     return tracks
