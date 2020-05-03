@@ -62,5 +62,5 @@ async def add_new_album(response: Response, album: Albums):
         "INSERT INTO albums (Title, ArtistId) VALUES (?, ?)", (album.title, album.artist_id)
     )
     await app.db_connection.commit()
-    response.status_code = status.HTTP_201_CREATED
+    response.status_code = status.HTTP_200_OK
     return {"AlbumId": cursor.lastrowid, "Title": album.title, "ArtistId": album.artist_id}
