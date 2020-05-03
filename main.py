@@ -43,3 +43,24 @@ async def composer_tracks(response: Response, composer_name: str):
         response.status_code = status.HTTP_404_NOT_FOUND
         return {"detail": {"error": "There is no such composer in database"}}
     return composer
+
+
+### ZADANIE 3 #########################################################
+class Albums(BaseModel):
+    title: str
+    artist_id: int
+
+@app.post("/albums")
+async def add_new_album(response: Response, album: Albums):
+    cursor = await app.db_connection.execute(
+        "SELECT ArtistId FROM artists WHERE ArtistId (?)", (album.artist_id, ))
+    result = await cursor.fetchone()
+    if result is None:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"detail": {"error": "There is no such composer in database"}}
+    cursor = await app.db_connection.execute(
+        "INSERT INTO albums (Title, ArtistId) VALUES (?, ?)", (album.title, album.artist_id)
+    )
+    await app.db_connection.commit()
+    response.status_code = status.HTTP_201_CREATED
+    return {"AlbumId": cursor.lastrowid, "Title": album.title, "ArtistId": album.artist_id}
