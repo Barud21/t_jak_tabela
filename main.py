@@ -59,9 +59,7 @@ async def add_new_album(response: Response, album: Albums):
         response.status_code = status.HTTP_404_NOT_FOUND
         return {"detail": {"error": "There is no such composer in database"}}
     cursor = await app.db_connection.execute(
-        "INSERT INTO albums (Title, ArtistId) VALUES (?, ?)", (album.title, album.artist_id)
-    )
+        "INSERT INTO albums (Title, ArtistId) VALUES (?, ?)", (album.title, album.artist_id))
     await app.db_connection.commit()
     response.status_code = status.HTTP_201_CREATED
-    new_album = {"AlbumId": cursor.lastrowid+1, "Title": album.title, "ArtistId": album.artist_id}
-    return new_album
+    return { "AlbumId": cursor.lastrowid, "Title": album.title, "ArtistId": album.artist_id }
