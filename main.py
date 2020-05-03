@@ -34,7 +34,7 @@ async def get_tracks(page: int = 0, per_page: int = 10):
 ### ZADANIE 2 #########################################################
 @app.get("/tracks/composers")
 async def composer_tracks(response: Response, composer_name: str):
-    app.db_connection.row_factory = aiosqlite.Row
+    app.db_connection.row_factory = lambda cursor, x: x[0]
     cursor = await app.db_connection.execute(
         "SELECT Name FROM tracks WHERE Composer = :composer_name ORDER BY Name",
         {'composer_name': composer_name})
