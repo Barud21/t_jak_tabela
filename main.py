@@ -68,7 +68,7 @@ async def add_new_album(response: Response, album: Albums):
 async def get_new_album(response: Response, album_id: int):
     app.db_connection.row_factory = aiosqlite.Row
     cursor = await app.db_connection.execute(
-        "SELECT AlbumId, Title, ArtistId FROM albums WHERE AlbumId = :album_id", {"album_id": album_id})
-    album = await cursor.fetchall
+        "SELECT * FROM albums WHERE AlbumId = :album_id", {"album_id": album_id})
+    album = await cursor.fetchall()
     response.status_code = status.HTTP_200_OK
     return album
