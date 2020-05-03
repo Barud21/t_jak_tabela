@@ -53,9 +53,9 @@ class Albums(BaseModel):
 @app.post("/albums")
 async def add_new_album(response: Response, album: Albums):
     cursor = await app.db_connection.execute(
-        "SELECT ArtistId FROM artists WHERE ArtistId (?)", (album.artist_id, ))
-    result = await cursor.fetchone()
-    if result is None:
+        "SELECT ArtistId FROM artists WHERE ArtistId = :artist_id", {"artist_id": album.artist_id})
+    artist = await cursor.fetchone()
+    if artist is None:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {"detail": {"error": "There is no such composer in database"}}
     cursor = await app.db_connection.execute(
