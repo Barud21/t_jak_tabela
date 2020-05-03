@@ -24,7 +24,7 @@ async def get_tracks(page: int = 0, per_page: int = 10):
     app.db_connection.row_factory = sqlite3.Row
     cursor = app.db_connection.execute("SELECT TrackId, Name, AlbumId, MediaTypeId, GenreId, "
                                        "Composer, Milliseconds, Bytes, UnitPrice "
-                                       " FROM tracks ORDER_BY TrackId LIMIT per_page = :per_page "
-                                       "OFFSET page=:page", {'per_page': per_page, 'page': page})
+                                       "FROM tracks ORDER_BY TrackId LIMIT :per_page "
+                                       "OFFSET :per_page* :page", {'per_page': per_page, 'page': page})
     tracks = await cursor.fetchall()
     return tracks
