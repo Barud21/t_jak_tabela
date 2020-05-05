@@ -72,3 +72,24 @@ async def get_new_album(response: Response, album_id: int):
     album = await cursor.fetchone()
     response.status_code = status.HTTP_200_OK
     return album
+
+
+### ZADANIE 3 #########################################################
+class Customer(BaseModel):
+    company: str = None
+    address: str = None
+    city: str = None
+    state: str = None
+    country: str = None
+    postalcode: str = None
+    fax: str = None
+
+# @app.put("/customer/{customer_id}")
+# async def edit_customer(response: Response, customer_id: int, customer: Customer):
+#     cursor = await app.db_connection.execute(
+#         "SELECT CustomerId FROM customers WHERE CustomerId = :customer_id", {"customer_id": customer_id})
+#     client = await cursor.fetchone()
+#     if client is None:
+#         response.status_code = status.HTTP_404_NOT_FOUND
+#         return {"detail": {"error": "There is no such customer"}}
+#     update_data = customer.dict(exclude_unset=True)
