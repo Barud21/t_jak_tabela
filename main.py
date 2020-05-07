@@ -74,7 +74,7 @@ async def get_new_album(response: Response, album_id: int):
     return album
 
 
-### ZADANIE 3 #########################################################
+### ZADANIE 4 #########################################################
 class Customer(BaseModel):
     company: str = None
     address: str = None
@@ -84,12 +84,29 @@ class Customer(BaseModel):
     postalcode: str = None
     fax: str = None
 
-# @app.put("/customer/{customer_id}")
-# async def edit_customer(response: Response, customer_id: int, customer: Customer):
-#     cursor = await app.db_connection.execute(
-#         "SELECT CustomerId FROM customers WHERE CustomerId = :customer_id", {"customer_id": customer_id})
-#     client = await cursor.fetchone()
-#     if client is None:
-#         response.status_code = status.HTTP_404_NOT_FOUND
-#         return {"detail": {"error": "There is no such customer"}}
-#     update_data = customer.dict(exclude_unset=True)
+@app.put("/customer/{customer_id}")
+async def edit_customer(response: Response, customer_id: int, customer: Customer):
+    cursor = await app.db_connection.execute(
+        "SELECT CustomerId FROM customers WHERE CustomerId = :customer_id", {"customer_id": customer_id})
+    client = await cursor.fetchone()
+    if client is None:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"detail": {"error": "There is no such customer"}}
+    update_data = customer.dict(exclude_unset=True)
+
+    for key, value in update_data.items():
+        if value == None:
+            continue
+        key.capitalize()
+        if key == "Postalcode":
+            key = "PostalCode"
+        cursor = await app.db_connection.execute(
+            "UPDATE customers SET ? = ? WHERE CustomerId = ?", (key, update_data(key), customer_id)
+        )
+        app.db_connection.commit()
+
+    app.db_connection.row_factory = aiosqlite.Row
+    updated_client = await app.db_connection.execute(
+        "SELECT * FROM customers WHERE CustomerId = ?", (customer_id, )).fetchone()
+    return updated_client
+
