@@ -95,14 +95,12 @@ async def edit_customer(response: Response, customer_id: int, customer: Customer
     update_data = customer.dict(exclude_unset=True)
 
     for key, value in update_data.items():
-        # if value == None:
-        #     continue
+        if value == None:
+            continue
         key.capitalize()
         if key == "Postalcode":
             key = "PostalCode"
-        cursor = await app.db_connection.execute(
-            "UPDATE customers SET ? = ? WHERE CustomerId = ?", (key, value, customer_id)
-        )
+        cursor = await app.db_connection.execute("UPDATE customers SET ? = ? WHERE CustomerId = ?", (key, value, customer_id, ))
         await app.db_connection.commit()
 
     app.db_connection.row_factory = aiosqlite.Row
