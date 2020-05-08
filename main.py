@@ -84,28 +84,82 @@ class Customer(BaseModel):
     postalcode: str = None
     fax: str = None
 
-@app.put("/customer/{customer_id}")
+
+class CustomerUpdate(BaseModel):
+    Company: str = None
+    Address: str = None
+    City: str = None
+    State: str = None
+    Country: str = None
+    PostalCode: str = None
+    Fax: str = None
+
+
+class CustomerModel(BaseModel):
+    CustomerId: int = None
+    FirstName: str = None
+    LastName: str = None
+    Company: str = None
+    Address: str = None
+    City: str = None
+    State: str = None
+    Country: str = None
+    PostalCode: str = None
+    Phone: str = None
+    Fax: str = None
+    Email: str = None
+    SupportRepId: int = None
+
+
+@app.put("/customer/{customer_id}", response_model=CustomerModel)
 async def edit_customer(response: Response, customer_id: int, customer: Customer):
-    cursor = await app.db_connection.execute(
-        "SELECT CustomerId FROM customers WHERE CustomerId = :customer_id", {"customer_id": customer_id})
-    client = await cursor.fetchone()
-    if client is None:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return {"detail": {"error": "There is no such customer"}}
-    update_data = customer.dict(exclude_unset=True)
-
-    for key, value in update_data.items():
-        if value == None:
-            continue
-        key.capitalize()
-        if key == "Postalcode":
-            key = "PostalCode"
-        cursor = await app.db_connection.execute("UPDATE customers SET ? = ? WHERE CustomerId = ?", (key, value, customer_id, ))
-        await app.db_connection.commit()
-
     app.db_connection.row_factory = aiosqlite.Row
     cursor = await app.db_connection.execute(
-        "SELECT * FROM customers WHERE CustomerId = ?", (customer_id, ))
-    updated_client = await cursor.fetchone()
-    return updated_client
+        "SELECT * FROM customers WHERE CustomerId = :customer_id", {"customer_id": customer_id})
+    data = await cursor.fetchone()
+    if data is None:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"detail": {"error": "There is no such customer"}}
 
+    stored_item_data = data
+    stored_item_model = CustomerModel(**stored_item_data)
+    data_update = CustomerUpdate(Company=customer.company, Address=customer.address, City=customer.city,
+                                 State=customer.state, Country=customer.country, PostalCode=customer.postalcode,
+                                 Fax=customer.fax)
+    update_data = data_update.dict(exclude_unset=True)
+    updated_customer = stored_item_model.copy(update=update_data)
+
+    cursor = app.db_connection.execute("UPDATE Company = ?, Address = ?, City = ?, State = ?, Country = ?, PostalCode "
+                                       "= ?, Fax = ?", (updated_customer.Company, updated_customer.Address,
+                                                        updated_customer.City, updated_customer.State,
+                                                        updated_customer.Country, updated_customer.PostalCode,
+                                                        updated_customer.Fax))
+    app.db_connection.commit()
+    return updated_customer
+
+# @app.put("/clients/{customer_id}")
+# async def edit_client(response: Response, customer_id: int, customer: Customer):
+#     cursor = await app.db_connection.execute(
+#         "SELECT CustomerId FROM customers WHERE CustomerId = :customer_id", {"customer_id": customer_id})
+#     data = await cursor.fetchone()
+#     if data is None:
+#         response.status_code = status.HTTP_404_NOT_FOUND
+#         return {"detail": {"error": "There is no such customer"}}
+#
+#     update_data = customer.dict(exclude_unset=True)
+#
+#     for key, value in update_data.items():
+#         if value == None:
+#             continue
+#         key.capitalize()
+#         if key == "Postalcode":
+#             key = "PostalCode"
+#         cursor = await app.db_connection.execute("UPDATE customers SET ? = ? WHERE CustomerId = ? ", (key, value, customer_id, ))
+#         app.db_connection.commit()
+#
+#     app.db_connection.row_factory = aiosqlite.Row
+#     client = await app.db_connection.execute(
+#         "SELECT * FROM customers WHERE CustomerId = ?", (customer_id, ))
+#     updated_client = await client.fetchone()
+#     return updated_client
+#
