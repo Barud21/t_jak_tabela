@@ -113,7 +113,7 @@ class CustomerModel(BaseModel):
 
 @app.put("/customer/{customer_id}", response_model=CustomerModel)
 async def edit_customer(response: Response, customer_id: int, customer: Customer):
-    app.db_connection.row_factory = aiosqlite.Row
+    app.db_connection.row_factory = sqlite3.Row
     cursor = await app.db_connection.execute(
         "SELECT * FROM customers WHERE CustomerId = ?", (customer_id, ))
     data = await cursor.fetchone()
