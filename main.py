@@ -1,7 +1,7 @@
 import aiosqlite
 import sqlite3
 from pydantic import BaseModel
-from fastapi import FastAPI, Response, status
+from fastapi import FastAPI, Response, status, Query
 
 app = FastAPI()
 
@@ -163,3 +163,19 @@ async def edit_customer(response: Response, customer_id: int, customer: Customer
 #     updated_client = await client.fetchone()
 #     return updated_client
 #
+
+
+### ZADANIE 5 #########################################################
+
+@app.get("/sales")
+async def sales_customer(response: Response, category: str = Query(None)):
+    app.db_connection.row_factory = aiosqlite.Row
+
+    if category == "customers":
+        cursor = await app.db_connection.execute("SELECT invoices.CustomerId, Email, Phone, ROUND(SUM(Total), 2) AS Sum FROM customers INNER JOIN invoices ON customers.CustomerId = invoices.CustomerId GROUP BY invoices.CustomerId ORDER BY Sum DESC, invoices.CustomerId ASC")
+        data = await cursor.fetchall()
+        return data
+
+    else:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"detail": {"error": "There is no such category"}}
