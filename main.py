@@ -176,6 +176,10 @@ async def sales_customer(response: Response, category: str = Query(None)):
         data = await cursor.fetchall()
         return data
 
+    if category == "genres":
+        cursor = await app.db_connection.execute("SELECT genres.Name, SUM(Quantity) AS Sum FROM invoice_items JOIN tracks ON invoice_items.TrackId = tracks.TrackId JOIN genres ON tracks.GenreId = genres.GenreId GROUP BY tracks.GenreId ORDER BY Sum DESC, genres.Name")
+        data = await cursor.fetchall()
+        return data
     else:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {"detail": {"error": "There is no such category"}}
