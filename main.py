@@ -111,7 +111,7 @@ class CustomerModel(BaseModel):
     SupportRepId: int = None
 
 
-@app.put("/customer/{customer_id}", response_model=CustomerModel)
+@app.put("/customers/{customer_id}", response_model=CustomerModel)
 async def edit_customer(response: Response, customer_id: int, customer: Customer):
     app.db_connection.row_factory = sqlite3.Row
     cursor = await app.db_connection.execute(
