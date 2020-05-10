@@ -114,9 +114,9 @@ class CustomerModel(BaseModel):
 @app.put("/customer/{customer_id}", response_model=CustomerModel)
 async def edit_customer(response: Response, customer_id: int, customer: Customer):
     app.db_connection.row_factory = sqlite3.Row
-    cursor = app.db_connection.execute(
+    cursor = await app.db_connection.execute(
         "SELECT * FROM customers WHERE CustomerId = ?", (customer_id, ))
-    data = cursor.fetchone()
+    data = await cursor.fetchone()
     if data is None:
         response.status_code = status.HTTP_404_NOT_FOUND
         return {"detail": {"error": "There is no such customer"}}
@@ -154,7 +154,7 @@ async def edit_customer(response: Response, customer_id: int, customer: Customer
 #         key.capitalize()
 #         if key == "Postalcode":
 #             key = "PostalCode"
-#         cursor = app.db_connection.execute("UPDATE customers SET ? = ? WHERE CustomerId = ? ", (key, value, customer_id))
+#         cursor = app.db_connection.execute("UPDATE ? = ? WHERE CustomerId = ? ", (key, value, customer_id))
 #         app.db_connection.commit()
 #
 #     app.db_connection.row_factory = aiosqlite.Row
