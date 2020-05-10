@@ -129,12 +129,12 @@ async def edit_customer(response: Response, customer_id: int, customer: Customer
     update_data = data_update.dict(exclude_unset=True)
     updated_customer = stored_item_model.copy(update=update_data)
 
-    cursor = app.db_connection.execute("UPDATE Company = ?, Address = ?, City = ?, State = ?, Country = ?, PostalCode "
+    cursor = await app.db_connection.execute("UPDATE Company = ?, Address = ?, City = ?, State = ?, Country = ?, PostalCode "
                                        "= ?, Fax = ?", (updated_customer.Company, updated_customer.Address,
                                                         updated_customer.City, updated_customer.State,
                                                         updated_customer.Country, updated_customer.PostalCode,
                                                         updated_customer.Fax))
-    app.db_connection.commit()
+    await app.db_connection.commit()
     return updated_customer
 
 # @app.put("/clients/{customer_id}")
@@ -149,12 +149,12 @@ async def edit_customer(response: Response, customer_id: int, customer: Customer
 #     update_data = customer.dict(exclude_unset=True)
 #
 #     for key, value in update_data.items():
-#         if value == None:
-#             continue
+#         # if value == None:
+#         #     continue
 #         key.capitalize()
 #         if key == "Postalcode":
 #             key = "PostalCode"
-#         cursor = await app.db_connection.execute("UPDATE customers SET ? = ? WHERE CustomerId = ? ", (key, value, customer_id, ))
+#         cursor = app.db_connection.execute("UPDATE customers SET ? = ? WHERE CustomerId = ? ", (key, value, customer_id))
 #         app.db_connection.commit()
 #
 #     app.db_connection.row_factory = aiosqlite.Row
@@ -162,7 +162,7 @@ async def edit_customer(response: Response, customer_id: int, customer: Customer
 #         "SELECT * FROM customers WHERE CustomerId = ?", (customer_id, ))
 #     updated_client = await client.fetchone()
 #     return updated_client
-#
+
 
 
 ### ZADANIE 5 #########################################################
