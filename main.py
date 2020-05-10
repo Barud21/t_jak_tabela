@@ -129,7 +129,7 @@ async def edit_customer(response: Response, customer_id: int, customer: Customer
     update_data = data_update.dict(exclude_unset=True)
     updated_customer = stored_item_model.copy(update=update_data)
 
-    cursor = app.db_connection.execute("UPDATE Company = ?, Address = ?, City = ?, State = ?, Country = ?, PostalCode "
+    cursor = app.db_connection.execute("UPDATE customers SET Company = ?, Address = ?, City = ?, State = ?, Country = ?, PostalCode "
                                        "= ?, Fax = ? WHERE CustomerId = ?", (updated_customer.Company, updated_customer.Address,
                                                         updated_customer.City, updated_customer.State,
                                                         updated_customer.Country, updated_customer.PostalCode,
@@ -140,7 +140,7 @@ async def edit_customer(response: Response, customer_id: int, customer: Customer
 # @app.put("/clients/{customer_id}")
 # async def edit_client(response: Response, customer_id: int, customer: Customer):
 #     cursor = await app.db_connection.execute(
-#         "SELECT CustomerId FROM customers WHERE CustomerId = :customer_id", {"customer_id": customer_id})
+#         "SELECT CustomerId FROM customers WHERE CustomerId = ?", (customer_id, ))
 #     data = await cursor.fetchone()
 #     if data is None:
 #         response.status_code = status.HTTP_404_NOT_FOUND
@@ -154,7 +154,7 @@ async def edit_customer(response: Response, customer_id: int, customer: Customer
 #         key.capitalize()
 #         if key == "Postalcode":
 #             key = "PostalCode"
-#         cursor = app.db_connection.execute("UPDATE ? = ? WHERE CustomerId = ? ", (key, value, customer_id))
+#         cursor = app.db_connection.execute("UPDATE customers SET ? = ? WHERE CustomerId = ? ", (key, value, customer_id, ))
 #         app.db_connection.commit()
 #
 #     app.db_connection.row_factory = aiosqlite.Row
